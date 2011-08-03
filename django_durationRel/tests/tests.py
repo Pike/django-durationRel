@@ -29,6 +29,12 @@ class OneOtherTest(test.TestCase):
         """
         self.assertEqual(list(self.one.get_current_others()), [self.other])
 
+    def test_latest(self):
+        """
+        Tests that get_latest_others works.
+        """
+        self.assertEqual(self.one.get_latest_others(), self.other)
+
     def test_serialization(self):
         """
         Tests that we can serialize and deserialize.

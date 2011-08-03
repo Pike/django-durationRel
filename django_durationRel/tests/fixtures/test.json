@@ -1,0 +1,26 @@
+[
+  {
+    "pk": 1, 
+    "model": "tests.other", 
+    "fields": {
+      "code": "other"
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "tests.one_others", 
+    "fields": {
+      "startdate": "2011-05-04 12:15:38", 
+      "other": 1, 
+      "enddate": null, 
+      "one": 1
+    }
+  }, 
+  {
+    "pk": 1, 
+    "model": "tests.one", 
+    "fields": {
+      "code": "one"
+    }
+  }
+]

@@ -64,3 +64,12 @@ class DurationRelField(models.ManyToManyField):
         def get_current_NAME(_self):
             return get_NAME_for(_self, datetime.utcnow())
         cls.add_to_class('get_current_%s' % name, get_current_NAME)
+
+        def get_latest_NAME(_self):
+            filterargs = {from_: _self}
+            q = (_through.objects
+                 .filter(**filterargs)
+                 .order_by('-startdate'))
+            return (to_model.objects
+                    .get(id=q.values_list(to, flat=True)[0]))
+        cls.add_to_class('get_latest_%s' % name, get_latest_NAME)
