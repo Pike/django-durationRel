@@ -29,6 +29,14 @@ class OneOtherTest(test.TestCase):
         """
         self.assertEqual(list(self.one.get_current_others()), [self.other])
 
+    def test_current_manager(self):
+        """
+        Tests that through.current works.
+        """
+        (one_other,) = One.others.through.current.all()
+        self.assertEqual(one_other.one, self.one)
+        self.assertEqual(one_other.other, self.other)
+
     def test_latest(self):
         """
         Tests that get_latest_others works.

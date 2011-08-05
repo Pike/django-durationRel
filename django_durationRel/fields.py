@@ -3,6 +3,24 @@ from django.db import models
 from datetime import datetime
 
 
+class CurrentManager(models.Manager):
+    def get_query_set(self):
+        date = datetime.utcnow()
+        return (super(CurrentManager, self).get_query_set()
+                .filter(models.Q(startdate__lte=date) |
+                        models.Q(startdate__isnull=True))
+                .filter(models.Q(enddate__gt=date) |
+                        models.Q(enddate__isnull=True)))
+
+
+class DatedManager(models.Manager):
+    def for_date(self, date):
+        return (self.filter(models.Q(startdate__lte=date) |
+                            models.Q(startdate__isnull=True))
+                .filter(models.Q(enddate__gt=date) |
+                        models.Q(enddate__isnull=True)))
+
+
 class DurationRelField(models.ManyToManyField):
     def __init__(self, to, **kwargs):
         models.ManyToManyField.__init__(self, to, **kwargs)
@@ -44,7 +62,9 @@ class DurationRelField(models.ManyToManyField):
                                               blank=True,
                                               null=True),
             'enddate': models.DateTimeField(blank=True,
-                                            null=True)
+                                            null=True),
+            'objects': DatedManager(),
+            'current': CurrentManager()
         })
         self.rel.through = _through
         super(DurationRelField, self).contribute_to_class(cls, name)
@@ -52,11 +72,8 @@ class DurationRelField(models.ManyToManyField):
         def get_NAME_for(_self, date):
             filterargs = {from_: _self}
             q = (_through.objects
-                 .filter(**filterargs)
-                 .filter(models.Q(startdate__lte=date) |
-                         models.Q(startdate__isnull=True))
-                 .filter(models.Q(enddate__gt=date) |
-                         models.Q(enddate__isnull=True)))
+                 .for_date(date)
+                 .filter(**filterargs))
             return (to_model.objects
                     .filter(id__in=list(q.values_list(to, flat=True))))
         cls.add_to_class('get_%s_for' % name, get_NAME_for)
