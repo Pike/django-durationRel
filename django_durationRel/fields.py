@@ -53,6 +53,11 @@ class DurationRelField(models.ManyToManyField):
         relname_from = 'durationRel_%s' % name
         relname_to = 'durationRel_%s' % (self.rel.related_name or
                                          (cls._meta.object_name.lower() + "_set"))
+
+        def _unicode(self):
+            return u'%s \u2014 %s' % (getattr(self, from_).__unicode__(),
+                                      getattr(self, to).__unicode__())
+
         _through = type(_name, (models.Model,), {
             'Meta': meta,
             '__module__': cls.__module__,
@@ -64,7 +69,8 @@ class DurationRelField(models.ManyToManyField):
             'enddate': models.DateTimeField(blank=True,
                                             null=True),
             'objects': DatedManager(),
-            'current': CurrentManager()
+            'current': CurrentManager(),
+            '__unicode__': _unicode
         })
         self.rel.through = _through
         super(DurationRelField, self).contribute_to_class(cls, name)
