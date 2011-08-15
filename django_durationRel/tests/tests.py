@@ -3,10 +3,11 @@ Test the DurationRelField class.
 """
 
 from django import test
-from models import One, Other
+from models import One, Other, OneByString
 
 
 class OneOtherTest(test.TestCase):
+
     def setUp(self):
         self.one = One.objects.create(code="one")
         self.other = Other.objects.create(code="other")
@@ -28,6 +29,11 @@ class OneOtherTest(test.TestCase):
         Tests that get_current_others works.
         """
         self.assertEqual(list(self.one.get_current_others()), [self.other])
+
+    def test_reference_by_string(self):
+        one_by_string = OneByString.objects.create(code="one_by_string")
+        self.assertEqual(one_by_string.others.__class__.__name__,
+                         self.one.others.__class__.__name__)
 
     def test_current_manager(self):
         """
