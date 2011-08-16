@@ -24,22 +24,17 @@ def test_runner_with_coverage(test_labels, verbosity=1, interactive=True,
     if hasattr(settings, 'COVERAGE_MODULES'):
         cov.stop()
 
-    # Print code metrics header
     print ''
     print '-------------------------------------------------------------------'
     print ' Unit Test Code Coverage Results'
     print '-------------------------------------------------------------------'
-
-    # Report code coverage metrics
-    if hasattr(settings, 'COVERAGE_MODULES'):
-        coverage_modules = []
-        for module in settings.COVERAGE_MODULES:
-            coverage_modules.append(
-              __import__(module, globals(), locals(), [''])
-            )
-        cov.report(coverage_modules, show_missing=1)
-        cov.html_report(coverage_modules, directory='coverage_report')
-    # Print code metrics footer
+    coverage_modules = []
+    for module in settings.COVERAGE_MODULES:
+        coverage_modules.append(
+          __import__(module, globals(), locals(), [''])
+        )
+    cov.report(coverage_modules, show_missing=1)
+    cov.html_report(coverage_modules, directory='coverage_report')
     print '-------------------------------------------------------------------'
 
     return test_results
