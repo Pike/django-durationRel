@@ -1,11 +1,11 @@
+import datetime
 from django.db import models
 
-from datetime import datetime
 
 
 class CurrentManager(models.Manager):
     def get_query_set(self):
-        date = datetime.utcnow()
+        date = datetime.datetime.utcnow()
         return (super(CurrentManager, self).get_query_set()
                 .filter(models.Q(startdate__lte=date) |
                         models.Q(startdate__isnull=True))
@@ -26,14 +26,13 @@ class DurationRelField(models.ManyToManyField):
         models.ManyToManyField.__init__(self, to, **kwargs)
 
     def contribute_to_class(self, cls, name):
-         # name also set in set_attributes_from_name
-         # hack needed by _get_m2m_db_table
+        # name also set in set_attributes_from_name
+        # hack needed by _get_m2m_db_table
         self.name = name
+        to_model = self.rel.to
         if isinstance(self.rel.to, basestring):
-            to_model = self.rel.to
             to = to_model.split('.')[-1]
         else:
-            to_model = self.rel.to
             to = self.rel.to._meta.object_name
         _name = '%s_%s' % (cls._meta.object_name, name)
         from_ = cls._meta.object_name.lower()
@@ -51,10 +50,11 @@ class DurationRelField(models.ManyToManyField):
         })
         # Construct and return the new class.
         relname_from = 'durationRel_%s' % name
-        relname_to = 'durationRel_%s' % (self.rel.related_name or
-                                         (cls._meta.object_name.lower() + "_set"))
+        relname_to = ('durationRel_%s' %
+                      (self.rel.related_name or
+                       (cls._meta.object_name.lower() + "_set")))
 
-        def _unicode(self):
+        def _unicode(self):  # pragma: no cover
             return u'%s \u2014 %s' % (getattr(self, from_).__unicode__(),
                                       getattr(self, to).__unicode__())
 
@@ -63,7 +63,7 @@ class DurationRelField(models.ManyToManyField):
             '__module__': cls.__module__,
             from_: models.ForeignKey(cls, related_name=relname_from),
             to: models.ForeignKey(to_model, related_name=relname_to),
-            'startdate': models.DateTimeField(default=datetime.utcnow,
+            'startdate': models.DateTimeField(default=datetime.datetime.utcnow,
                                               blank=True,
                                               null=True),
             'enddate': models.DateTimeField(blank=True,
@@ -85,7 +85,7 @@ class DurationRelField(models.ManyToManyField):
         cls.add_to_class('get_%s_for' % name, get_NAME_for)
 
         def get_current_NAME(_self):
-            return get_NAME_for(_self, datetime.utcnow())
+            return get_NAME_for(_self, datetime.datetime.utcnow())
         cls.add_to_class('get_current_%s' % name, get_current_NAME)
 
         def get_latest_NAME(_self):
