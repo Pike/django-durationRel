@@ -11,7 +11,6 @@ def test_runner_with_coverage(test_labels, verbosity=1, interactive=True,
     # Start code coverage before anything else if necessary
     if hasattr(settings, 'COVERAGE_MODULES'):
         cov = coverage.coverage()
-        #coverage.use_cache(0) # Do not cache any of the coverage.py stuff
         cov.use_cache(0)  # Do not cache any of the coverage.py stuff
         cov.start()
 
